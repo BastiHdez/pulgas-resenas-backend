@@ -1,0 +1,56 @@
+Historias de Usuario - Sistema de Valoración y Reputación
+
+1) Historia de Usuario – Valoración de Productos (puntuación)
+Como cliente de la tienda,
+Quiero poder asignar una puntuación del 1 al 5 a los productos que he comprado,
+Para que otros clientes tengan una referencia objetiva de la calidad del producto.
+
+Criterios de Aceptación:
+- El cliente puede seleccionar un número entre 1 y 5.
+- La puntuación queda asociada al producto comprado.
+
+--------------------------------------------------
+
+2) Historia de Usuario – Valoración de Productos (comentario)
+Como cliente de la tienda,
+Quiero poder dejar un comentario sobre los productos que he comprado,
+Para que otros clientes conozcan mi experiencia de uso de manera más detallada.
+
+Criterios de Aceptación:
+- El comentario es opcional.
+- Se muestra junto a la puntuación del producto.
+
+--------------------------------------------------
+
+3) Historia de Usuario – Valoración de Vendedores
+Como cliente de la tienda,
+Quiero poder valorar a los vendedores con los que he interactuado,
+Para que otros clientes puedan conocer la calidad del servicio del vendedor.
+
+Criterios de Aceptación:
+- El cliente puede seleccionar una puntuación del 1 al 5.
+- El cliente puede dejar un comentario opcional sobre el vendedor.
+- La valoración se almacena y se muestra en el perfil del vendedor.
+
+--------------------------------------------------
+
+4) Historia de Usuario – Promedio de Valoraciones de Productos
+Como cliente de la tienda,
+Quiero ver el promedio de valoraciones de cada producto,
+Para que pueda tomar decisiones informadas al momento de comprar.
+
+Criterios de Aceptación:
+- El sistema calcula automáticamente el promedio de valoraciones del producto.
+- El promedio se muestra en la página del producto.
+
+--------------------------------------------------
+
+5) Historia de Usuario – Promedio de Valoraciones de Vendedores
+Como administrador de la tienda,
+Quiero ver el promedio de valoraciones de cada vendedor,
+Para que pueda evaluar su desempeño y calidad de servicio.
+
+Criterios de Aceptación:
+- El sistema calcula automáticamente el promedio de cada vendedor.
+- El promedio se muestra en la interfaz de administración.
+- Se puede filtrar y ordenar a los vendedores según su promedio.
