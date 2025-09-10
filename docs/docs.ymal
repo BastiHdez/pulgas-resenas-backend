@@ -1,8 +1,8 @@
 openapi: 3.0.4
 info:
   title: Reseñas API
-  description: API para la creación y distribución de reseñas en la página Pulgashop.
-  version: 0.1.0
+  description: API para la creación, consulta, actualización y eliminación de reseñas y puntuaciones en la página Pulgashop.
+  version: 0.2.0
 
 paths:
   /resenaProducto:
@@ -10,11 +10,53 @@ paths:
       summary: Obtener todas las reseñas
       responses:
         "200":
-          description: Éxito
+          description: Lista de reseñas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resena'
+    post:
+      summary: Crear una nueva reseña
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NuevaResena'
+      responses:
+        "201":
+          description: Reseña creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resena'
 
   /resenaProducto/{id_resena}:
-    get:
-      summary: Obtener una reseña por su ID
+    put:
+      summary: Actualizar una reseña existente
+      parameters:
+        - name: id_resena
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NuevaResena'
+      responses:
+        "200":
+          description: Reseña actualizada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resena'
+    delete:
+      summary: Eliminar una reseña por ID
       parameters:
         - name: id_resena
           in: path
@@ -22,8 +64,8 @@ paths:
           schema:
             type: string
       responses:
-        "200":
-          description: Éxito
+        "204":
+          description: Reseña eliminada exitosamente
 
   /resenaProducto/producto/{id_producto}:
     get:
@@ -36,7 +78,13 @@ paths:
             type: string
       responses:
         "200":
-          description: Éxito
+          description: Lista de reseñas del producto
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resena'
 
   /resenaProducto/comprador/{id_comprador}:
     get:
@@ -49,7 +97,13 @@ paths:
             type: string
       responses:
         "200":
-          description: Éxito
+          description: Lista de reseñas del comprador
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resena'
 
   /resenaProducto/vendedor/{id_vendedor}:
     get:
@@ -62,18 +116,66 @@ paths:
             type: string
       responses:
         "200":
-          description: Éxito
+          description: Lista de reseñas del vendedor
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resena'
 
   /puntuacionVendedor:
     get:
       summary: Obtener todas las puntuaciones de vendedores
       responses:
         "200":
-          description: Éxito
+          description: Lista de puntuaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Puntuacion'
+    post:
+      summary: Crear una puntuación para un vendedor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NuevaPuntuacion'
+      responses:
+        "201":
+          description: Puntuación creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Puntuacion'
 
   /puntuacionVendedor/{id_puntuacion}:
-    get:
-      summary: Obtener una puntuación por ID
+    put:
+      summary: Actualizar una puntuación existente
+      parameters:
+        - name: id_puntuacion
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NuevaPuntuacion'
+      responses:
+        "200":
+          description: Puntuación actualizada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Puntuacion'
+    delete:
+      summary: Eliminar una puntuación por ID
       parameters:
         - name: id_puntuacion
           in: path
@@ -81,8 +183,8 @@ paths:
           schema:
             type: string
       responses:
-        "200":
-          description: Éxito
+        "204":
+          description: Puntuación eliminada exitosamente
 
   /puntuacionVendedor/vendedor/{id_vendedor}:
     get:
@@ -95,7 +197,13 @@ paths:
             type: string
       responses:
         "200":
-          description: Éxito
+          description: Lista de puntuaciones del vendedor
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Puntuacion'
 
   /puntuacionVendedor/comprador/{id_comprador}:
     get:
@@ -108,4 +216,84 @@ paths:
             type: string
       responses:
         "200":
-          description: Éxito
+          description: Lista de puntuaciones del comprador
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Puntuacion'
+
+components:
+  schemas:
+    Resena:
+      type: object
+      properties:
+        id_resena:
+          type: string
+        id_producto:
+          type: string
+        id_comprador:
+          type: string
+        id_vendedor:
+          type: string
+        comentario:
+          type: string
+        puntuacion:
+          type: integer
+      required:
+        - id_resena
+        - id_producto
+        - id_comprador
+        - comentario
+        - puntuacion
+
+    NuevaResena:
+      type: object
+      properties:
+        id_producto:
+          type: string
+        id_comprador:
+          type: string
+        id_vendedor:
+          type: string
+        comentario:
+          type: string
+        puntuacion:
+          type: integer
+      required:
+        - id_producto
+        - id_comprador
+        - comentario
+        - puntuacion
+
+    Puntuacion:
+      type: object
+      properties:
+        id_puntuacion:
+          type: string
+        id_vendedor:
+          type: string
+        id_comprador:
+          type: string
+        puntuacion:
+          type: integer
+      required:
+        - id_puntuacion
+        - id_vendedor
+        - id_comprador
+        - puntuacion
+
+    NuevaPuntuacion:
+      type: object
+      properties:
+        id_vendedor:
+          type: string
+        id_comprador:
+          type: string
+        puntuacion:
+          type: integer
+      required:
+        - id_vendedor
+        - id_comprador
+        - puntuacion
