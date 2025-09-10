@@ -22,19 +22,7 @@ Criterios de Aceptación:
 
 --------------------------------------------------
 
-3) Historia de Usuario – Valoración de Vendedores
-Como cliente de la tienda,
-Quiero poder valorar a los vendedores con los que he interactuado,
-Para que otros clientes puedan conocer la calidad del servicio del vendedor.
-
-Criterios de Aceptación:
-- El cliente puede seleccionar una puntuación del 1 al 5.
-- El cliente puede dejar un comentario opcional sobre el vendedor.
-- La valoración se almacena y se muestra en el perfil del vendedor.
-
---------------------------------------------------
-
-4) Historia de Usuario – Promedio de Valoraciones de Productos
+3) Historia de Usuario – Promedio de Valoraciones de Productos
 Como cliente de la tienda,
 Quiero ver el promedio de valoraciones de cada producto,
 Para que pueda tomar decisiones informadas al momento de comprar.
@@ -43,14 +31,3 @@ Criterios de Aceptación:
 - El sistema calcula automáticamente el promedio de valoraciones del producto.
 - El promedio se muestra en la página del producto.
 
---------------------------------------------------
-
-5) Historia de Usuario – Promedio de Valoraciones de Vendedores
-Como administrador de la tienda,
-Quiero ver el promedio de valoraciones de cada vendedor,
-Para que pueda evaluar su desempeño y calidad de servicio.
-
-Criterios de Aceptación:
-- El sistema calcula automáticamente el promedio de cada vendedor.
-- El promedio se muestra en la interfaz de administración.
-- Se puede filtrar y ordenar a los vendedores según su promedio.
