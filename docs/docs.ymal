@@ -1,112 +1,111 @@
 openapi: 3.0.4
 info:
-  title: reseñas API
-  descripcion: es la api que permite la creacion y distribucion de reseñas en la pagina pulgashop
-  version: 0.1
-
-security:
-  - bearerAuth: []
+  title: Reseñas API
+  description: API para la creación y distribución de reseñas en la página Pulgashop.
+  version: 0.1.0
 
 paths:
-/resenaProducto:
+  /resenaProducto:
     get:
-      summary: punto donde se guardan los datos de la reseñaes la tabla que contiene la informacion relacionada con la reseña como su id y contenidos
+      summary: Obtener todas las reseñas
       responses:
         "200":
-        descripcion: éxito
+          description: Éxito
 
-    requestBody:
-        required: true
-
-/resenaProducto/id_resena:
+  /resenaProducto/{id_resena}:
     get:
-      summary: es el identificador unico de cada reseña
+      summary: Obtener una reseña por su ID
+      parameters:
+        - name: id_resena
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
-        descripcion: éxito
+          description: Éxito
 
-/resenaProducto/{id_producto}:
+  /resenaProducto/producto/{id_producto}:
     get:
-      summary: es el identificador obtendido del grupo 6 para un producto
+      summary: Obtener reseñas por ID de producto
+      parameters:
+        - name: id_producto
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
-        descripcion: éxito
+          description: Éxito
 
-/resenaProducto/{id_comprador}:
+  /resenaProducto/comprador/{id_comprador}:
     get:
-      summary: es el identificador obtendido del grupo 2 para un usuario
+      summary: Obtener reseñas por ID de comprador
+      parameters:
+        - name: id_comprador
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
-        descripcion: éxito
+          description: Éxito
 
-/resenaProducto/{id_vendedor}:
+  /resenaProducto/vendedor/{id_vendedor}:
     get:
-      summary:  es el identificador obtendido del grupo 4 para una tienda
+      summary: Obtener reseñas por ID de vendedor
+      parameters:
+        - name: id_vendedor
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
-        descripcion: éxito
+          description: Éxito
 
-/resenaProducto/calificacion:
+  /puntuacionVendedor:
     get:
-      summary: es la calificacion que se da en la reseña va de 1 a 5
+      summary: Obtener todas las puntuaciones de vendedores
       responses:
         "200":
-        descripcion: éxito
+          description: Éxito
 
-/resenaProducto/comentario:
+  /puntuacionVendedor/{id_puntuacion}:
     get:
-      summary: es un comentario opsional que va en la reseña
+      summary: Obtener una puntuación por ID
+      parameters:
+        - name: id_puntuacion
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
-        descripcion: éxito
+          description: Éxito
 
-/resenaProducto/fecha_creacion:
+  /puntuacionVendedor/vendedor/{id_vendedor}:
     get:
-      summary: es la fecha en la que se creo la reseña
+      summary: Obtener puntuaciones por ID de vendedor
+      parameters:
+        - name: id_vendedor
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
-        descripcion: éxito
+          description: Éxito
 
-/puntuacionVendedor:
+  /puntuacionVendedor/comprador/{id_comprador}:
     get:
-      summary: es la tabla que guarda la informacion de las puntuciones que tiene los vendedores
+      summary: Obtener puntuaciones por ID de comprador
+      parameters:
+        - name: id_comprador
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
-        descripcion: éxito
-    requestBody:
-        required: true
-
-/puntuacionVendedor/id_puntuacion:
-    get:
-      summary: es el identificador unico de la puntuacion de un vendedor
-      responses:
-        "200":
-        descripcion: éxito
-
-/puntuacionVendedor/{id_vendedor}:
-    get:
-      summary: es el identificador obtendido del grupo 4 para una tienda
-        responses:
-        "200":
-        descripcion: éxito
-
-/puntuacionVendedor/{id_comprador}:
-    get:
-      summary: es el identificador obtendido del grupo 2 para un usuario
-      responses:
-        "200":
-        descripcion: éxito
-
-/puntuacionVendedor/puntuacion:
-    get:
-      summary: es la puntuacion que se le da un vendedor
-      responses:
-        "200":
-        descripcion: éxito
-
-/puntuacionVendedor/fecha_creacion:
-    get:
-      summary: es la fecha del ultimo cambio en la puntucaion de un vendedor
-      responses:
-        "200":
-        descripcion: éxito dal cambiar la fecha
+          description: Éxito
