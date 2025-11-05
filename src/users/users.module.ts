@@ -1,15 +1,24 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { HttpModule } from '@nestjs/axios';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { User, UserSchema } from './schemas/user.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    ConfigModule,
+    HttpModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        baseURL: config.get<string>('API_BASE_URL'),
+        timeout: Number(config.get('API_TIMEOUT_MS')) || 5000,
+        maxRedirects: 5,
+      }),
+    }),
   ],
   controllers: [UsersController],
   providers: [UsersService],
-  exports: [UsersService], // Exportamos el servicio para que pueda ser usado por otros módulos
+  exports: [UsersService],
 })
 export class UsersModule {}

@@ -11,10 +11,42 @@ import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './schemas/dto/create-user.dto';
 import { UpdateUserDto } from './schemas/dto/update-user.dto';
 
+
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+   // Inyectamos HttpService para poder consumir APIs externas
+  constructor(private readonly http:  ) {}
 
+  /**
+   * Obtiene un usuario público desde la API externa:
+   *   GET /api/users/public/:id
+   */
+  async getPublicUserById(id: string): Promise<any> {
+    try {
+      const { data } = await firstValueFrom(
+        this.http
+          .get(`/api/users/public/${encodeURIComponent(id)}`)
+          .pipe(
+            catchError((err: AxiosError) => {
+              throw err;
+            }),
+          ),
+      );
+
+      if (!data) {
+        throw new NotFoundException('Usuario no encontrado en la API externa');
+      }
+
+      return data;
+    } catch (err: any) {
+      // Si la API devuelve 404, lanzamos la excepción adecuada en NestJS:
+      if (err?.response?.status === 404) {
+        throw new NotFoundException('Usuario no encontrado en la API externa');
+      }
+      // Si es otro error, lo propagamos tal cual:
+      throw err;
+    }
+  }
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     // Verificar si el email ya existe
     const existingUser = await this.userModel.findOne({

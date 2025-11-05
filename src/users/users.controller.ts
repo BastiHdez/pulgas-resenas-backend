@@ -4,9 +4,16 @@ import { CreateUserDto } from './schemas/dto/create-user.dto';
 import { UpdateUserDto } from './schemas/dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
+
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+    // GET /users/public/:id  -> consume la API externa y retorna el JSON
+  @Get('public/:id')
+  async getPublic(@Param('id') id: string) {
+    return this.usersService.getPublicUserById(id);
+  }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
