@@ -1,28 +1,24 @@
 import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
 
 @Module({
   imports: [
-    // Carga y valida las variables de entorno
-    ConfigModule.forRoot({
-      isGlobal: true, // Disponible en toda la aplicación
-    }),
-    
-    // Conexión a MongoDB
-    MongooseModule.forRootAsync({
+    ConfigModule,
+    HttpModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI'),
+      useFactory: (config: ConfigService) => ({
+        baseURL: config.get<string>('API_BASE_URL'),
+        timeout: Number(config.get('API_TIMEOUT_MS')) || 5000,
+        maxRedirects: 5,
       }),
     }),
-    
-    // Módulos de la aplicación
-    AuthModule,
-    UsersModule,
   ],
+  controllers: [UsersController],
+  providers: [UsersService],
+  exports: [UsersService],
 })
-export class AppModule {}
+export class UsersModule {}

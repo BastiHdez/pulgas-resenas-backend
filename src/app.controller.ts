@@ -1,12 +1,13 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get, Param } from '@nestjs/common';
+import { UsersService } from './users.service';
 
-@Controller()
-export class AppController {
-  constructor(private readonly appService: AppService) {}
+@Controller('users')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  // GET /users/public/:id  -> consume la API externa y retorna el JSON
+  @Get('public/:id')
+  async getPublic(@Param('id') id: string) {
+    return this.usersService.getPublicUserById(id);
   }
 }
