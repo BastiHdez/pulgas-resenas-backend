@@ -5,71 +5,103 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { firstValueFrom } from 'rxjs';
+
 import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './schemas/dto/create-user.dto';
 import { UpdateUserDto } from './schemas/dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private readonly http: HttpService,
+    private readonly config: ConfigService,
+  ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserDocument> {
-    // Verificar si el email ya existe
-    const existingUser = await this.userModel.findOne({
-      email: createUserDto.email,
-    });
-    if (existingUser) {
-      throw new ConflictException('El correo electrónico ya está registrado');
+  /**
+   * Consumir API externa GET /api/users/public/:id
+   * Usa baseURL del HttpModule (configurada en UsersModule) o de env.
+   */
+  async getPublicUserById(id: string): Promise<any> {
+    // Si definiste baseURL en HttpModule, basta con ruta relativa:
+    const url = `/api/users/public/${id}`;
+
+    const { data } = await firstValueFrom(this.http.get(url));
+    return data;
+  }
+
+  // ---- CRUD local en MongoDB ----
+
+  async create(dto: CreateUserDto): Promise<User> {
+    // Evitar duplicados por email
+    const exists = await this.userModel.findOne({ email: dto.email }).lean();
+    if (exists) {
+      throw new ConflictException('El email ya está registrado');
     }
 
-    // Hashear la contraseña
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
+    const hash = await bcrypt.hash(dto.password, 10);
 
-    // Crear el nuevo usuario
-    const newUser = new this.userModel({
-      ...createUserDto,
-      password: hashedPassword,
+    const created = await this.userModel.create({
+      ...dto,
+      email: dto.email.toLowerCase().trim(),
+      password: hash,
+      isActive: true,
     });
 
-    return newUser.save();
+    return created.toJSON() as any;
   }
 
   async findAll(): Promise<User[]> {
-    return this.userModel.find().select('-password').exec();
+    const users = await this.userModel.find().lean();
+    // lean() ya quita getters/setters; si necesitas toJSON, quita lean()
+    return users as any;
   }
 
   async findOne(id: string): Promise<User> {
-    const user = await this.userModel.findById(id).select('-password').exec();
+    const user = await this.userModel.findById(id).lean();
     if (!user) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
     }
-    return user;
+    return user as any;
   }
 
-  async findByEmail(email: string): Promise<UserDocument> {
-    return this.userModel.findOne({ email }).exec();
+  async findByEmail(email: string): Promise<User | null> {
+    return (await this.userModel.findOne({ email: email.toLowerCase().trim() }).lean()) as any;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    // Si hay una nueva contraseña, la hasheamos
-    if (updateUserDto.password) {
-      const salt = await bcrypt.genSalt();
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
+  async update(id: string, dto: UpdateUserDto): Promise<User> {
+    const update: Partial<User> = { ...dto };
+
+    if (dto.email) {
+      update.email = dto.email.toLowerCase().trim();
+      const duplicate = await this.userModel.findOne({
+        _id: { $ne: id },
+        email: update.email,
+      }).lean();
+      if (duplicate) {
+        throw new ConflictException('El email ya está en uso por otro usuario');
+      }
     }
 
-    const updatedUser = await this.userModel
-      .findByIdAndUpdate(id, updateUserDto, { new: true })
-      .select('-password')
-      .exec();
+    if (dto.password) {
+      update.password = await bcrypt.hash(dto.password, 10);
+    }
 
-    if (!updatedUser) {
+    const updated = await this.userModel.findByIdAndUpdate(id, update, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updated) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
     }
 
-    return updatedUser;
+    return updated.toJSON() as any;
   }
 
   async remove(id: string): Promise<void> {

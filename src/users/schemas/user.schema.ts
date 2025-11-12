@@ -1,38 +1,37 @@
 // src/users/schemas/user.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 
-// Para tener mejor tipado con MongoDB:
-export interface UserDocument extends User, Document {
-  id: string; // Mongoose crea un getter 'id' que devuelve el _id como string
-}
+export type UserDocument = HydratedDocument<User>;
 
 @Schema({
   timestamps: true,
   toJSON: {
     virtuals: true,
-    transform: (_, ret) => {
-      ret.id = ret._id;
+    versionKey: false,
+    transform: (_doc, ret) => {
+      // Exponer id como string y ocultar _id y password
+      ret._id = ret._id?.toString?.() ?? ret._id;
       delete ret._id;
-      delete ret.__v;
+      //delete ret.password;
       return ret;
     },
   },
 })
 export class User {
-  @Prop({ required: true })
-  name: string;
+  @Prop({ required: true, trim: true })
+  firstName: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, trim: true })
   lastName: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, lowercase: true, trim: true, index: true })
   email: string;
 
   @Prop({ required: true })
   password: string;
 
-  @Prop({ default: 'user' }) // 'admin' o 'user'
+  @Prop({ default: 'user', enum: ['user', 'admin'] })
   role: string;
 
   @Prop({ default: true })
@@ -41,7 +40,7 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-// Añadir un virtual 'id' para acceso más fácil al _id como string
-UserSchema.virtual('id').get(function () {
-  return this._id.toHexString();
+// Virtual id (string)
+UserSchema.virtual('id').get(function (this: any) {
+  return this._id?.toHexString?.() ?? `${this._id}`;
 });

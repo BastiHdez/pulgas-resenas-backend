@@ -17,7 +17,7 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
     if (user && (await bcrypt.compare(password, user.password))) {
-      const { password, ...result } = user.toObject();
+      const { password, ...result } = user as any;
       return result;
     }
     return null;
@@ -57,7 +57,7 @@ export class AuthService {
     const newUser = await this.usersService.create(createUserDto);
 
     // Convertimos a un objeto plano para manejar las propiedades correctamente
-    const user = newUser.toObject ? newUser.toObject() : newUser;
+    const user = newUser as any;
 
     // Usamos id en lugar de _id
     const userId = user.id || user._id?.toString();
