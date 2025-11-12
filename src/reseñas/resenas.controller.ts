@@ -12,13 +12,13 @@ import { QueryResenasDto } from './dto/query-resenas.dto';
 export class ResenasController {
   constructor(private readonly service: ResenasService) {}
 
-  @Get()
+  /*@Get()
   listar(
     @Param('productoId', ParseIntPipe) productoId: number,
     @Query() query: QueryResenasDto,
   ) {
     return this.service.listarPorProducto(productoId, query);
-  }
+  }*/
 
   @Post()
   crear(

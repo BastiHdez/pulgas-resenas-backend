@@ -12,13 +12,13 @@ import { QueryPuntuacionesDto } from './dto/query-puntuaciones.dto';
 export class PuntuacionesController {
   constructor(private readonly service: PuntuacionesService) {}
 
-  @Get()
+  /*@Get()
   listar(
     @Param('vendedorId', ParseIntPipe) vendedorId: number,
     @Query() query: QueryPuntuacionesDto,
   ) {
     return this.service.listarPorVendedor(vendedorId, query);
-  }
+  }*/
 
   @Post()
   crear(

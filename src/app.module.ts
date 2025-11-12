@@ -1,24 +1,15 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
-    ConfigModule,
-    HttpModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        baseURL: config.get<string>('API_BASE_URL'),
-        timeout: Number(config.get('API_TIMEOUT_MS')) || 5000,
-        maxRedirects: 5,
-      }),
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
+    HttpModule,
   ],
-  controllers: [UsersController],
-  providers: [UsersService],
-  exports: [UsersService],
+  controllers: [AppController],
+  providers: [AppService],
 })
-export class UsersModule {}
+export class AppModule {}
