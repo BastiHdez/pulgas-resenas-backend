@@ -1,21 +1,34 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
-    "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./",
-    "incremental": true,
-    "skipLibCheck": true,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    /* Módulos y Compatibilidad */
+    "target": "es2020",             /* Versión moderna de ECMAScript para el código de salida */
+    "module": "commonjs",           /* Sistema de módulos de Node.js */
+    "moduleResolution": "node",     /* Resolución de módulos de Node.js */
+    "esModuleInterop": true,        /* Permite importar librerías CommonJS con sintaxis ES */
+    "resolveJsonModule": true,      /* Incluye módulos JSON importados */
+    "allowSyntheticDefaultImports": true, /* Permite importaciones por defecto en módulos sin default export */
+    "allowJs": true,                /* Permite compilar archivos JS */
+    "emitDecoratorMetadata": true,  /* Necesario si usas decoradores (ej: NestJS, TypeORM) */
+    "experimentalDecorators": true, /* Habilita el soporte experimental para decoradores */
+
+    /* Salida y Rutas */
+    "outDir": "./dist",             /* Directorio de salida para el código compilado */
+    "rootDir": "./src",             /* Raíz de los archivos fuente */
+    "sourceMap": true,              /* Genera archivos .map para debugging */
+    "baseUrl": "./src",             /* Directorio base para rutas de importación */
+    "removeComments": true,         /* Elimina comentarios en el código JavaScript final */
+    "declaration": true,            /* Genera archivos .d.ts (si quieres publicar el paquete) */
+    "incremental": true,            /* Acelera compilaciones futuras */
+    
+    /* Reglas de Estrictez y Chequeo */
+    "strict": true,                 /* Habilita todas las opciones de estrictez */
+    "skipLibCheck": true,           /* Omite el chequeo de tipos en librerías (ej: node_modules) */
+    "forceConsistentCasingInFileNames": true, /* Asegura que los nombres de archivos sean consistentes */
+
+    /* Reglas de estrictez que estaban desactivadas y que puedes reevaluar */
+    "strictNullChecks": false,      /* Desactivada: Permite evitar errores de null/undefined (pero es menos seguro) */
+    "noImplicitAny": false          /* Desactivada: Permite usar 'any' sin error (pero es menos seguro) */
+  },
+  "include": ["src/**/*"],          /* Archivos a incluir en la compilación */
+  "exclude": ["node_modules", "dist"] /* Directorios a excluir de la compilación */
 }
