@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: pg_ratings
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ratings
+      POSTGRES_PASSWORD: ratings
+      POSTGRES_DB: ratingsdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ratings -d ratingsdb || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_ratings
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: resenas.pruebas@gmail.com   # debe tener dominio con punto
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5051:80"                               # usa 5051 para evitar choques
+    volumes:
+      - ../pgadmin_data:/var/lib/pgadmin        # guarda conexiones/ajustes
+    depends_on:
+      postgres:
+        condition: service_healthy
