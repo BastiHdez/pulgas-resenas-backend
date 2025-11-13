@@ -76,6 +76,17 @@ export class PuntuacionesService {
     return found;
   }
 
+    async listarPorVendedor(vendedorId: number, query: QueryPuntuacionesDto) {
+    // TODO: implement real fetching / pagination / filtering
+    const { limit = 10, offset = 0 } = (query as any) || {};
+    return {
+      data: [], // replace with fetched puntuaciones for vendedorId
+      count: 0,
+      limit,
+      offset,
+    };
+  } 
+  
   actualizar(vendedorId: number, id_puntuacion: number, dto: UpdatePuntuacionDto) {
     const bucket = this.getBucket(vendedorId);
     const idx = bucket.findIndex((p) => p.id_puntuacion === id_puntuacion);
