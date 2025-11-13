@@ -12,7 +12,9 @@ export class UsersController {
     // GET /users/public/:id  -> consume la API externa y retorna el JSON
   @Get('public/:id')
   async getPublic(@Param('id') id: string) {
-    return this.usersService.getPublicUserById(id);
+    const user = await this.usersService.findPublicById(id);
+    //if (!user) throw new NotFoundException('User not found');
+    return user; // ya viene saneado
   }
 
   @Post()

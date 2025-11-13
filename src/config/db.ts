@@ -41,7 +41,7 @@ export const query = (text: string, params: any[] = []): Promise<QueryResult<any
 export async function connectDb(): Promise<void> {
     try {
         const client = await pool.connect();
-        console.log(`✅ Conexión establecida a PostgreSQL en ${config.host}:${config.port}/${config.database}`);
+        console.log(`Conexión establecida a PostgreSQL en ${config.host}:${config.port}/${config.database}`);
         client.release();
     } catch (err) {
         // --- INICIO DE LA CORRECCIÓN TS2339 ---
@@ -54,7 +54,7 @@ export async function connectDb(): Promise<void> {
             errorDetails = err;
         }
 
-        console.error(`❌ Error al conectar a PostgreSQL en ${config.host}:${config.port}:`, errorDetails);
+        console.error(`Error al conectar a PostgreSQL en ${config.host}:${config.port}:`, errorDetails);
         
         // Si la conexión falla al inicio, cerramos el proceso.
         process.exit(1);

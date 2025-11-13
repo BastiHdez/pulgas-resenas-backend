@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     /* Módulos y Compatibilidad */
-    "target": "es2020",             /* Versión moderna de ECMAScript para el código de salida */
+    "target": "es2022",             /* Versión moderna de ECMAScript para el código de salida */
     "module": "commonjs",           /* Sistema de módulos de Node.js */
     "moduleResolution": "node",     /* Resolución de módulos de Node.js */
     "esModuleInterop": true,        /* Permite importar librerías CommonJS con sintaxis ES */

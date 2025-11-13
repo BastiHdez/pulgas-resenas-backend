@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { CreateUserDto } from 'src/users/schemas/dto/create-user.dto';
+import { CreateUserDto } from 'users/schemas/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {

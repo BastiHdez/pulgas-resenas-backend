@@ -4,22 +4,27 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  
+  // Habilitar CORS para permitir conexiones desde el frontend
   app.enableCors({
-    origin: ['http://localhost:5173'],
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    origin: 'http://localhost:5173', // URL del frontend (Vite usa el puerto 5173 por defecto)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   });
-
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    transform: true,
-    forbidUnknownValues: false,
-  }));
-
-  const port = process.env.PORT ? Number(process.env.PORT) : 3500;
+  
+  // Configuración global de validación de DTOs
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Elimina propiedades que no están en el DTO
+      transform: true,  // Transforma los datos recibidos al tipo del DTO
+    }),
+  );
+  
+  // Prefijo global para todas las rutas de la API
+  app.setGlobalPrefix('api');
+  
+  const port = process.env.PORT || 3000;
   await app.listen(port);
-  // eslint-disable-next-line no-console
-  console.log(`API running on http://localhost:${port}`);
+  console.log(`Aplicación ejecutándose en: http://localhost:${port}/api`);
 }
 bootstrap();
