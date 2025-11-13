@@ -22,7 +22,7 @@ services:
     container_name: pgadmin_ratings
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: resenas.pruebas@gmail.com   # debe tener dominio con punto
+      PGADMIN_DEFAULT_EMAIL: franco.contreras@alumnos.uv.cl   # debe tener dominio con punto
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5051:80"                               # usa 5051 para evitar choques
