@@ -1,0 +1,55 @@
+{
+    "items": [
+        {
+            "idResena": "c9617b6d-2966-49e3-a4f1-79931f9a338e",
+            "comentario": "muy bueno el producto",
+            "puntuacion": 5,
+            "fecha": "2025-11-21T03:47:47.568Z",
+            "idComprador": "33",
+            "nombreComprador": "Carlos",
+            "votos": {
+                "up": 0,
+                "down": 0
+            }
+        },
+        {
+            "idResena": "2e21b33d-2c76-4705-870a-1c54ad329fa6",
+            "comentario": null,
+            "puntuacion": 3,
+            "fecha": "2025-11-21T03:05:54.959Z",
+            "idComprador": "12",
+            "nombreComprador": "Nico",
+            "votos": {
+                "up": 0,
+                "down": 0
+            }
+        },
+        {
+            "idResena": "c16f039a-7505-4b9b-b1b2-ed5538d345c3",
+            "comentario": "oiuhgtfhdxcvb nmjhuytfrd",
+            "puntuacion": 1,
+            "fecha": "2025-11-21T03:02:24.735Z",
+            "idComprador": "11",
+            "nombreComprador": "nicoo",
+            "votos": {
+                "up": 0,
+                "down": 0
+            }
+        },
+        {
+            "idResena": "069a81b0-bf82-4926-8486-dee7b8e5f6b8",
+            "comentario": "probando",
+            "puntuacion": 2,
+            "fecha": "2025-11-21T03:02:15.729Z",
+            "idComprador": "10",
+            "nombreComprador": "UserTest",
+            "votos": {
+                "up": 0,
+                "down": 0
+            }
+        }
+    ],
+    "total": 4,
+    "limit": 10,
+    "offset": 0
+}
