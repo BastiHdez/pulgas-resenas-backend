@@ -1,0 +1,248 @@
+openapi: 3.0.0
+info:
+  title: API de Reseñas y Votos
+  description: API para gestionar calificaciones y votos de comentarios de productos.
+  version: 1.0.0
+servers:
+  - url: /
+tags:
+  - name: Reseñas
+    description: Operaciones sobre calificaciones y comentarios de productos.
+  - name: Votos
+    description: Operaciones para votar comentarios (útil/no útil).
+
+paths:
+  # --- Endpoints de ResenasController ---
+
+  /ratings/{productId}/average:
+    get:
+      tags:
+        - Reseñas
+      summary: Obtener el promedio de calificación y cantidad de reseñas por producto.
+      operationId: getProductAverageRating
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del producto.
+      responses:
+        '200':
+          description: Promedio de calificación y conteo.
+          content:
+            application/json:
+              schema:
+                type: object # Se asume una respuesta con promedio y cantidad (ej: { average: 4.5, count: 120 })
+                properties:
+                  average:
+                    type: number
+                    format: float
+                  count:
+                    type: integer
+
+  /ratings/{productId}/comments:
+    get:
+      tags:
+        - Reseñas
+      summary: Listar reseñas de un producto con paginación.
+      description: Lista las reseñas (comentarios) de un producto, incluyendo conteo de votos.
+      operationId: listProductComments
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del producto.
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Cantidad máxima de reseñas a devolver (tope 50).
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Número de reseñas a saltar (paginación).
+      responses:
+        '200':
+          description: Lista de reseñas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resena'
+
+    post:
+      tags:
+        - Reseñas
+      summary: Crear una nueva reseña con comentario.
+      description: Alias semántico para la creación de una reseña (idéntico a POST /ratings/{productId}).
+      operationId: createResena
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del producto a reseñar.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateResenaDto'
+      responses:
+        '201':
+          description: Reseña creada exitosamente.
+
+  /ratings/{productId}:
+    post:
+      tags:
+        - Reseñas
+      summary: Puntuar o agregar una reseña al producto (calificación obligatoria, comentario opcional).
+      description: También sirve como "agregar reseña".
+      operationId: rateProduct
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del producto a calificar.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RateOnlyDto'
+      responses:
+        '201':
+          description: Calificación o reseña registrada exitosamente.
+
+  /ratings/comments/{idResena}:
+    delete:
+      tags:
+        - Reseñas
+      summary: Eliminar una reseña.
+      description: Solo el autor (`idComprador`) puede eliminar su propia reseña.
+      operationId: deleteResena
+      parameters:
+        - name: idResena
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID de la reseña a eliminar.
+        - name: idComprador  # <-- CORRECCIÓN: Movido a Query Parameter
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario que intenta eliminar la reseña (debe ser el autor).
+      # Se eliminó el 'requestBody' para cumplir con el estándar DELETE
+      responses:
+        '200':
+          description: Reseña eliminada.
+
+  # --- Endpoints de VotosController ---
+
+  /ratings/comments/{idResena}/vote:
+    post:
+      tags:
+        - Votos
+      summary: Votar un comentario (útil o no útil).
+      operationId: voteComment
+      parameters:
+        - name: idResena
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID de la reseña/comentario a votar.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoteDto'
+      responses:
+        '201':
+          description: Voto registrado exitosamente.
+
+components:
+  schemas:
+    RateOnlyDto:
+      type: object
+      properties:
+        idUsuario:
+          type: integer
+          description: ID del usuario que califica.
+        calificacion:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Calificación del producto (1 a 5 estrellas).
+        comentario:
+          type: string
+          nullable: true
+          description: Comentario de la reseña (opcional).
+      required:
+        - idUsuario
+        - calificacion
+
+    CreateResenaDto:
+      type: object
+      properties:
+        idUsuario:
+          type: integer
+          description: ID del usuario que crea la reseña.
+        calificacion:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Calificación del producto (1 a 5 estrellas).
+        comentario:
+          type: string
+          description: Contenido del comentario.
+      required:
+        - idUsuario
+        - calificacion
+        - comentario
+
+    VoteDto:
+      type: object
+      properties:
+        idUsuario:
+          type: integer
+          description: ID del usuario que vota.
+        voto:
+          type: integer
+          description: 'Tipo de voto (ej: 1 para útil, -1 para no útil).' # <-- CORRECCIÓN: Descripción encerrada en comillas
+      required:
+        - idUsuario
+        - voto
+
+    Resena:
+      type: object
+      properties:
+        id:
+          type: string
+        idUsuario:
+          type: integer
+        calificacion:
+          type: integer
+        comentario:
+          type: string
+        votosUtiles:
+          type: integer
+          description: Conteo de votos útiles.
+        votosNoUtiles:
+          type: integer
+          description: Conteo de votos no útiles.
