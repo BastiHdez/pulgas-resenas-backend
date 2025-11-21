@@ -1,4 +1,11 @@
-import { Injectable, BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Resena } from '../resena.entity';
@@ -177,4 +184,39 @@ export class ResenasService {
       offset,
     };
   }
+
+// ---------------------------
+// Eliminar reseña (solo autor)
+// ---------------------------
+async deleteResena(idResena: string, idComprador: number) {
+  const resena = await this.resenaRepo.findOne({ where: { idResena } });
+
+  if (!resena) {
+    throw new NotFoundException('Reseña no encontrada.');
+  }
+
+  const dbComprador = Number(resena.idComprador);
+  const bodyComprador = Number(idComprador);
+
+  // DEBUG (puedes borrar estos console.log cuando esté ok)
+  console.log('[deleteResena] idResena =', idResena);
+  console.log('[deleteResena] dbComprador =', dbComprador, ' bodyComprador =', bodyComprador);
+
+  if (!Number.isFinite(bodyComprador)) {
+    throw new BadRequestException('idComprador inválido.');
+  }
+
+  if (dbComprador !== bodyComprador) {
+    throw new ForbiddenException('No puedes eliminar una reseña de otro usuario.');
+  }
+
+  // Borrar primero los votos asociados
+  await this.votoRepo.delete({ idResena });
+
+  // Borrar la reseña
+  await this.resenaRepo.delete({ idResena });
+
+  return { status: 'deleted' as const };
+}
+
 }

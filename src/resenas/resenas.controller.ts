@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Query } from '@nestjs/common';
 import { ResenasService } from './resenas.service';
 import { RateOnlyDto } from './dto/rate-only.dto';
 import { CreateResenaDto } from './dto/create-resena.dto';
@@ -28,13 +28,28 @@ export class ResenasController {
 
   /** Puntuar (comentario opcional). También sirve como "agregar reseña" */
   @Post(':productId')
-  rate(@Param('productId') productId: string, @Body() dto: RateOnlyDto) {
+  rate(
+    @Param('productId') productId: string,
+    @Body() dto: RateOnlyDto,
+  ) {
     return this.service.rateProduct(Number(productId), dto);
   }
 
   /** Alias semántico: crear reseña bajo /comments (idéntico a /:productId) */
   @Post(':productId/comments')
-  create(@Param('productId') productId: string, @Body() dto: CreateResenaDto) {
+  create(
+    @Param('productId') productId: string,
+    @Body() dto: CreateResenaDto,
+  ) {
     return this.service.createResena(Number(productId), dto);
+  }
+
+  /** Eliminar reseña (solo autor) */
+  @Delete('comments/:idResena')
+  deleteComment(
+    @Param('idResena') idResena: string,
+    @Body('idComprador') idComprador: number,
+  ) {
+    return this.service.deleteResena(idResena, Number(idComprador));
   }
 }
