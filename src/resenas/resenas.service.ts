@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, ConflictException } from '@nestjs/common';
+import { Injectable, BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Resena } from '../resena.entity';
@@ -108,6 +108,30 @@ export class ResenasService {
         comentario: dto.comentario ?? null, // comentario OPCIONAL
       });
     } catch (e) {
+      this.handlePgError(e);
+    }
+  }
+
+  /** Eliminar reseña por producto y comprador */
+  async deleteResena(productId: number, idComprador: number) {
+    try {
+      const result = await this.resenaRepo.delete({
+        idProducto: productId,
+        idComprador: idComprador,
+      });
+
+      if (result.affected === 0) {
+        throw new NotFoundException(`No se encontró reseña para el producto ${productId} y comprador ${idComprador}.`);
+      }
+
+      // TypeORM en cascada debería eliminar también los votos asociados (si se configuró bien en la entidad)
+      return { productId, idComprador, action: 'deleted', affected: result.affected };
+    } catch (e) {
+      // Reutiliza el manejo de errores si son de DB.
+      // Si es un NotFoundException, se lanza directamente.
+      if (e instanceof NotFoundException) {
+        throw e;
+      }
       this.handlePgError(e);
     }
   }

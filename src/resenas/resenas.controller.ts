@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, Delete, BadRequestException } from '@nestjs/common';
 import { ResenasService } from './resenas.service';
 import { RateOnlyDto } from './dto/rate-only.dto';
 import { CreateResenaDto } from './dto/create-resena.dto';
@@ -36,5 +36,19 @@ export class ResenasController {
   @Post(':productId/comments')
   create(@Param('productId') productId: string, @Body() dto: CreateResenaDto) {
     return this.service.createResena(Number(productId), dto);
+  }
+  
+  /** Eliminar reseña por producto y comprador (se requiere idComprador para seguridad) */
+  @Delete(':productId')
+  remove(
+    @Param('productId') productId: string,
+    @Query('idComprador') idComprador: string, // Se necesita el ID del comprador para saber qué reseña borrar
+  ) {
+    // Es crucial validar que idComprador sea un número válido antes de pasarlo al servicio
+    const parsedIdComprador = Number(idComprador);
+    if (isNaN(parsedIdComprador)) {
+        throw new BadRequestException('El idComprador debe ser un número válido.');
+    }
+    return this.service.deleteResena(Number(productId), parsedIdComprador);
   }
 }
