@@ -26,6 +26,28 @@ export class ResenasController {
     });
   }
 
+  /**
+   * 🔗 Endpoint especial para el microservicio de Publicaciones
+   * GET /ratings/publicacion/:productId
+   *
+   * Devuelve SOLO el arreglo de reseñas (items) para que el backend principal
+   * lo pueda inyectar como `reseñas` en la respuesta de la publicación.
+   */
+  @Get('publicacion/:productId')
+  async listForPublicacion(
+    @Param('productId') productId: string,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    const result = await this.service.listByProduct(Number(productId), {
+      limit: Math.min(Number(limit || 10), 50),
+      offset: Math.max(Number(offset || 0), 0),
+    });
+
+    // Solo devolvemos el array de reseñas para que sea compatible con `reseñas = []`
+    return result.items;
+  }
+
   /** Puntuar (comentario opcional). También sirve como "agregar reseña" */
   @Post(':productId')
   rate(
