@@ -1,0 +1,73 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16
+    container_name: pg_ratings
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ratings
+      POSTGRES_PASSWORD: ratings
+      POSTGRES_DB: resenaspulgas
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ratings -d resenaspulgas || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - pulgas-net
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_ratings
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: franco.contreras@alumnos.uv.cl
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5051:80"
+    volumes:
+      - ./pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - pulgas-net
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pulgas-backend
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - pulgas-net
+
+  nginx:
+    image: nginx:alpine
+    container_name: pulgas-nginx
+    depends_on:
+      - backend
+    ports:
+      - "3500:80"          # Todo tu API se expone por este puerto
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - pulgas-net
+
+networks:
+  pulgas-net:
+
+volumes:
+  postgres_data:
+  pgadmin_data:
