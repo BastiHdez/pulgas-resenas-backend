@@ -1,0 +1,90 @@
+===============================
+INSTRUCCIONES PARA CREACIÓN DE BD
+===============================
+
+1. Abrir pgAdmin en:
+   http://localhost:5051
+
+2. Credenciales:
+   Email: franco.contreras@estudiantes.uv.cl
+   Password: admin
+
+3. Crear servidor:
+   - Host: db
+   - Usuario: ratings
+   - Password: ratings
+   - DB: resenaspulgas
+
+
+4. Crear tablas resena y voto_resena desde Query Tool en la BD.
+
+Copiar y pegar el siguiente script:
+
+-- ==========================================================
+-- ECOMMERCE RATINGS — SCHEMA BASE
+-- Tablas: resena, voto_resena
+-- Requisitos: PostgreSQL 13+ (recomendado 15/16)
+-- ==========================================================
+
+-- 1) Extensiones (UUID + crypto)
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- 2) Tabla principal de reseñas
+--    - comentario: OPCIONAL
+--    - puntuacion: 1..5
+--    - UNIQUE(id_producto, id_comprador) => evita duplicados del mismo comprador sobre el mismo producto
+CREATE TABLE IF NOT EXISTS public.resena (
+  id_resena         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id_producto       bigint NOT NULL,
+  id_comprador      bigint NOT NULL,
+  id_vendedor       bigint NOT NULL,
+  comentario        text,
+  puntuacion        integer NOT NULL CHECK (puntuacion BETWEEN 1 AND 5),
+  fecha_resena      timestamptz NOT NULL DEFAULT now(),
+  nombre_comprador  varchar(100) NOT NULL
+);
+
+-- Índice de aceleración por producto
+CREATE INDEX IF NOT EXISTS idx_resena_producto ON public.resena (id_producto);
+
+-- Único para “no duplicados” (mismo comprador no puede reseñar dos veces el mismo producto)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'uq_resena_producto_comprador'
+  ) THEN
+    ALTER TABLE public.resena
+      ADD CONSTRAINT uq_resena_producto_comprador
+      UNIQUE (id_producto, id_comprador);
+  END IF;
+END$$;
+
+-- 3) Tabla de votos a reseñas (👍 / 👎)
+--    - Un usuario solo puede votar una vez por reseña
+CREATE TABLE IF NOT EXISTS public.voto_resena (
+  id_voto     uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id_resena   uuid NOT NULL REFERENCES public.resena(id_resena) ON DELETE CASCADE,
+  id_usuario  bigint NOT NULL,
+  voto        boolean NOT NULL
+);
+
+-- Un usuario no puede votar dos veces la misma reseña
+CREATE UNIQUE INDEX IF NOT EXISTS uq_voto_resena_id_resena_usuario
+  ON public.voto_resena (id_resena, id_usuario);
+
+-- Acelerar agregaciones de votos por reseña
+CREATE INDEX IF NOT EXISTS idx_voto_resena_id_resena
+  ON public.voto_resena (id_resena);
+
+-- 4) (Opcional) Vista de promedio por producto
+--    Útil si quieres consultar agregados rápido desde SQL puro
+CREATE OR REPLACE VIEW public.vw_rating_promedio AS
+SELECT
+  r.id_producto,
+  COALESCE(AVG(r.puntuacion)::numeric(10,2), 0) AS promedio,
+  COUNT(*)::bigint AS total
+FROM public.resena r
+GROUP BY r.id_producto;
